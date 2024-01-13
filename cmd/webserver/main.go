@@ -3,6 +3,7 @@ package main
 import (
 	"log/slog"
 
+	"github.com/joho/godotenv"
 	"github.com/tiburciohugo/users-api-go/config/logger"
 )
 
@@ -22,6 +23,7 @@ func (u user) LogUser() slog.Value {
 
 func main() {
 	logger.InitLogger()
+	godotenv.Load()
 
 	user := user{
 		Name:     "Hugo",
