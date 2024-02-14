@@ -10,8 +10,13 @@ func NewUserRepository(db *sql.DB, q *sqlc.Queries) UserRepository {
 }
 
 type repository struct {
-	db *sql.DB
+	db      *sql.DB
 	queries *sqlc.Queries
+}
+
+// CreateUser implements UserRepository.
+func (r *repository) CreateUser() error {
+	return nil
 }
 
 type UserRepository interface {
