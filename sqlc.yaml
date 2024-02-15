@@ -1,9 +1,27 @@
+# version: "1"
+# packages:
+#   - name: "db"
+#     schema: "internal/database/migrations/*.sql"
+#     queries: "internal/database/queries/*.sql"
+#     engine: "postgresql"
+#     emit_json_tags: true
+#     emit_prepared_queries: false
+#     emit_interface: false
+#     emit_exact_table_names: false
+#     emit_empty_slices: false
+
+
 version: "2"
 sql:
-  - schema: "internal/database/migrations"
-    queries: "internal/database/queries"
+  - schema: "internal/database/migrations/*.sql"
+    queries: "internal/database/queries/*.sql"
     engine: "postgresql"
     gen:
       go:
         package: "sqlc"
         out: "internal/database/sqlc"
+        emit_json_tags: true
+        emit_prepared_queries: false
+        emit_interface: false
+        emit_exact_table_names: false
+        emit_empty_slices: false

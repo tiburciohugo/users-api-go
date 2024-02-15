@@ -3,6 +3,7 @@ module github.com/tiburciohugo/users-api-go
 go 1.21.5
 
 require (
+	github.com/go-chi/chi v1.5.5
 	github.com/joho/godotenv v1.5.1
 	github.com/spf13/viper v1.18.2
 )

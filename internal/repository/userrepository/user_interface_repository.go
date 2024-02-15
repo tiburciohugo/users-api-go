@@ -1,6 +1,10 @@
 package userrepository
 
-import "database/sql"
+import (
+	"database/sql"
+
+	"github.com/tiburciohugo/users-api-go/internal/database/sqlc"
+)
 
 func NewUserRepository(db *sql.DB, q *sqlc.Queries) UserRepository {
 	return &repository{
