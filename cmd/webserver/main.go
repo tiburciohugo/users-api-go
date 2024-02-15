@@ -1,36 +1,51 @@
 package main
 
 import (
+	"fmt"
 	"log/slog"
+	"net/http"
 
-	"github.com/joho/godotenv"
+	"github.com/go-chi/chi"
+	"github.com/tiburciohugo/users-api-go/config/env"
 	"github.com/tiburciohugo/users-api-go/config/logger"
+	"github.com/tiburciohugo/users-api-go/internal/database"
+	"github.com/tiburciohugo/users-api-go/internal/database/sqlc"
+	"github.com/tiburciohugo/users-api-go/internal/handler/routes"
+	"github.com/tiburciohugo/users-api-go/internal/handler/userhandler"
+	"github.com/tiburciohugo/users-api-go/internal/repository/userrepository"
+	"github.com/tiburciohugo/users-api-go/internal/service/userservice"
 )
-
-type user struct {
-	Name     string `json:"name"`
-	Age      int    `json:"age"`
-	Password string `json:"password"`
-}
-
-func (u user) LogUser() slog.Value {
-	return slog.GroupValue(
-		slog.String("name", u.Name),
-		slog.Int("age", u.Age),
-		slog.String("password", "********"),
-	)
-}
 
 func main() {
 	logger.InitLogger()
-	godotenv.Load()
+	slog.Info("Starting API...")
 
-	user := user{
-		Name:     "Hugo",
-		Age:      32,
-		Password: "123456",
+	_, err := env.LoadingConfig(".")
+	if err != nil {
+		slog.Error("Error loading environment variables", slog.String("package", "main"))
+		return
 	}
 
-	slog.Info("Starting API...")
-	slog.Info("User", user.LogUser())
+	dbConnection, err := database.NewDBConnection()
+	if err != nil {
+		slog.Error("Error establishing database connection", "err", err, slog.String("package", "main"))
+		return
+	}
+
+	router := chi.NewRouter()
+	queries := sqlc.New(dbConnection)
+
+	userRepo := userrepository.NewUserRepository(dbConnection, queries)
+	newUserService := userservice.NewUserService(userRepo)
+	newUserHandler := userhandler.NewUserHandler(newUserService)
+
+	routes.InitUserRoutes(router, newUserHandler)
+
+	port := fmt.Sprintf(":%s", env.Env.GoPort)
+	slog.Info(fmt.Sprintf("Server running on port %s", port), slog.String("package", "main"))
+	err = http.ListenAndServe(port, router)
+	if err != nil {
+		slog.Error("Error starting server", slog.String("package", "main"))
+	}
+
 }

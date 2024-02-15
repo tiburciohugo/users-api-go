@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"log/slog"
 
+	_ "github.com/lib/pq"
 	"github.com/tiburciohugo/users-api-go/config/env"
 )
 
